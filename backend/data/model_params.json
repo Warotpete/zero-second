@@ -1,0 +1,11 @@
+{
+  "params": {
+    "scale": 0.65,
+    "recent_weight": 0.1,
+    "prior_games": 4.0,
+    "state_boost": 1.0
+  },
+  "trainBrier": 0.067,
+  "trainMatches": 60,
+  "trainSeeds": "50000+"
+}
