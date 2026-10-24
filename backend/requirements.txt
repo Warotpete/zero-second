@@ -6,3 +6,4 @@ agent-framework-core==1.23.0
 agent-framework-foundry==1.15.0
 azure-ai-projects==2.7.0
 azure-identity==1.26.0
+tenacity==9.1.4
