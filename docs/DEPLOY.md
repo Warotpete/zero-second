@@ -36,18 +36,25 @@ About 45 minutes the first time. Portal labels change often; if a button is name
 If an agent call fails or times out, Zero Second falls back to the deterministic writer and logs it in the audit log, so the demo never breaks.
 
 ## 4. Deploy to Azure Container Apps
-From the repository root in PowerShell:
-```powershell
-./infra/deploy.ps1 `
-  -FoundryEndpoint "https://<resource>.services.ai.azure.com/api/projects/<project>" `
-  -FoundryModel "<deployment name>" `
-  -FoundryResourceId "/subscriptions/<sub>/resourceGroups/zero-second-rg/providers/Microsoft.CognitiveServices/accounts/<resource>"
-```
-The script:
-- builds the Docker image in Azure Container Registry and creates the Container App (`az containerapp up`),
-- pins it to one always-on replica (live rooms are in memory; no cold starts for judges),
-- turns on a managed identity and grants it **Foundry User** on the Foundry resource (no keys),
-- prints the public URL.
+
+### Paid subscriptions: one script
+`./infra/deploy.ps1 -FoundryEndpoint … -FoundryModel … -FoundryResourceId …` builds the image in Azure Container Registry and creates the app (`az containerapp up`).
+
+### Free Trial subscriptions (what the live demo uses)
+Free Trial blocks ACR cloud builds (`TasksOperationsNotAllowed`), so GitHub Actions builds the image instead:
+
+1. Create the registry and environment once (the first `deploy.ps1` run does this even when the build step fails).
+2. `powershell -ExecutionPolicy Bypass -File .\infra\set-github-secrets.ps1` stores the registry login as GitHub secrets.
+3. Every push to `main` that touches the app runs `.github/workflows/image.yml`, which pushes `zero-second:<sha>` and `:latest` to the registry.
+4. First time only, create the app (it pulls with its own managed identity, no passwords):
+   ```powershell
+   az containerapp create -n zero-second -g zero-second-rg --environment zero-second-env `
+     --image <registry>.azurecr.io/zero-second:latest --registry-server <registry>.azurecr.io --registry-identity system `
+     --system-assigned --ingress external --target-port 8000 --min-replicas 1 --max-replicas 1 --cpu 1 --memory 2Gi `
+     --env-vars ZS_LLM=auto FOUNDRY_PROJECT_ENDPOINT=<endpoint> FOUNDRY_MODEL=gpt-5-mini ZS_REASONING_EFFORT=low
+   ```
+5. Grant the app's identity **Foundry User** and **Cognitive Services OpenAI User** on the Foundry resource. Allow up to 10 minutes for the roles to apply (until then you'll see 403s and the deterministic fallback).
+6. To release a new build: `az containerapp update -n zero-second -g zero-second-rg --image <registry>.azurecr.io/zero-second:<sha>`
 
 Check logs: `az containerapp logs show -n zero-second -g zero-second-rg --follow`
 
