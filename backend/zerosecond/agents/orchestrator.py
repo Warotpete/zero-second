@@ -236,7 +236,10 @@ class Orchestrator:
                 self._audit("Writer", "Fallback", "deterministic writer used", sid, "warn")
             c.versions = versions
             if s.resolved:
-                return  # triggered while writing; on_trigger handles it
+                if s.resolution != "happened":
+                    c.state = "discarded"  # ruled out while the agents were writing
+                    self._audit("Editor", "Discarded", f"{s.title}: {s.resolution_note}", sid)
+                return  # if it happened while writing, on_trigger handles it
             c.state = "ready"
             c.ready_t = self.now()
             s.prep = "ready"

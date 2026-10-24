@@ -19,7 +19,8 @@ log = logging.getLogger("zerosecond.foundry")
 EDITOR_PROMPT = """You are the Editor agent of Zero Second, a newsroom system for football broadcasters.
 Story Radar (a statistical model) has flagged a storyline that may happen in the live match.
 Use the Zero Second MCP tools to look up context (player arcs, milestones, head-to-head, recent xG) if useful.
-Decide the editorial angle in one short sentence and whether content should be prepared now.
+Decide the editorial angle in one short sentence and whether content should be prepared now. The angle should say why the
+storyline matters (history, milestone, rivalry), not describe live match statistics.
 Reply with JSON only: {"prepare": true|false, "angle": "<one sentence>"}.
 Never invent statistics."""
 
@@ -30,6 +31,10 @@ Rules:
 - You may use the live slots listed in the request; they are filled automatically at the moment it happens.
   Write slots literally with braces, e.g. "in the {minute_ord} minute".
 - Write for when the storyline HAS happened (past/present tense).
+- Do not describe the match situation (who leads, equaliser, winner) unless the facts pack says it; show the
+  score only through the {score} slot.
+- Do not mention probabilities, forecasts or models in the copy.
+- The editorial angle is guidance on tone and emphasis only: never copy numbers, shots, xG or match events from it.
 - Versions: en_analyst (1-2 sentences, data-rich, measured), en_casual (one punchy line for fans),
   th_casual (natural Thai for Thai fans, with an English "gloss" translation), overlay (UPPERCASE headline
   under 40 characters and a short UPPERCASE sub line).
@@ -37,9 +42,14 @@ Reply with JSON only:
 {"versions":[{"key":"en_analyst","text":"..."},{"key":"en_casual","text":"..."},
 {"key":"th_casual","text":"...","gloss":"..."},{"key":"overlay","text":"HEADLINE","sub":"SUB"}]}"""
 
-VERIFIER_PROMPT = """You are the Verifier agent of Zero Second. Check whether every claim in the draft is supported by the
-facts pack. Numbers are already checked by code; focus on meaning: wrong player, wrong team, wrong direction
-(e.g. 'won' vs 'lost'), claims not in the facts. Live slots in braces are fine.
+VERIFIER_PROMPT = """You are the Verifier agent of Zero Second. The draft is PRE-WRITTEN content that will only be
+published at the moment the storyline in the facts pack happens. So judge it as if the storyline has just happened:
+values such as club_goals_now or streak_before are the state BEFORE the moment, and `target` is the value AFTER it
+(e.g. club_goals_now 49, target 50 -> "his 50th club goal" is correct). Live slots in braces are filled from match
+data later and are always fine. Numbers are already checked by code.
+Reject only real problems of meaning: wrong player or team, a claim about the match situation that the facts do not
+support (e.g. "put them ahead", "won it"), wrong direction (won vs lost), invented events, or mentions of
+probabilities/models. Ignore style.
 Reply with JSON only: {"ok": true|false, "issues": ["..."]}."""
 
 RECAP_PROMPT = """You are the Recap agent of Zero Second. Write three full-time recaps from the verified lifecycle log:
@@ -95,6 +105,11 @@ def _short_args(args: Any) -> str:
     return ""
 
 
+def _for_writer(facts: dict) -> dict:
+    """The Writer writes for the moment it happens, so it must not see the live match state."""
+    return {k: v for k, v in facts.items() if k not in ("why_now", "score_now")}
+
+
 class FoundryAgents:
     """Holds the four agents and the MCP connection for the app's lifetime."""
 
@@ -106,7 +121,7 @@ class FoundryAgents:
         self.model = os.getenv("FOUNDRY_MODEL", "")
 
     async def start(self) -> None:
-        from agent_framework import Agent, MCPStreamableHTTPTool
+        from agent_framework import Agent
         from agent_framework.foundry import FoundryChatClient
         from azure.identity.aio import DefaultAzureCredential
 
@@ -116,19 +131,13 @@ class FoundryAgents:
             model=os.environ["FOUNDRY_MODEL"],
             credential=self._cred,
         )
-        tools = []
-        if self.mcp_url:
-            try:
-                self._mcp = MCPStreamableHTTPTool(name="zerosecond", url=self.mcp_url, load_prompts=False)
-                await self._mcp.__aenter__()
-                tools = [self._mcp]
-            except Exception as exc:  # the Editor still works without tools
-                log.warning("MCP tool unavailable: %s", exc)
-                self._mcp = None
-        self.editor = Agent(client, EDITOR_PROMPT, name="Editor", tools=tools)
-        self.writer = Agent(client, WRITER_PROMPT, name="Writer")
-        self.verifier = Agent(client, VERIFIER_PROMPT, name="Verifier")
-        self.recapper = Agent(client, RECAP_PROMPT, name="Recap")
+        # reasoning models (e.g. gpt-5-mini): low effort keeps each agent call to a few seconds
+        effort = os.getenv("ZS_REASONING_EFFORT", "low")
+        opts = {"reasoning": {"effort": effort}} if effort != "off" else None
+        self.editor = Agent(client, EDITOR_PROMPT, name="Editor", default_options=opts)
+        self.writer = Agent(client, WRITER_PROMPT, name="Writer", default_options=opts)
+        self.verifier = Agent(client, VERIFIER_PROMPT, name="Verifier", default_options=opts)
+        self.recapper = Agent(client, RECAP_PROMPT, name="Recap", default_options=opts)
         self._ready = True
 
     async def stop(self) -> None:
@@ -149,7 +158,23 @@ class FoundryAgents:
             f"Room id for MCP tools: {room}\nStoryline facts pack:\n{json.dumps(facts, ensure_ascii=False)}\n"
             "Decide the angle."
         )
-        return await self._run(self.editor, prompt)
+        mcp = await self._mcp_tool()
+        resp = await asyncio.wait_for(self.editor.run(prompt, tools=[mcp] if mcp else None), timeout=self.timeout)
+        return _json(resp.text), _tool_calls(resp)
+
+    async def _mcp_tool(self):
+        """Connect to our own MCP server on first use (it isn't listening yet during startup)."""
+        if self._mcp is None and self.mcp_url and not getattr(self, "_mcp_failed", False):
+            from agent_framework import MCPStreamableHTTPTool
+
+            try:
+                tool = MCPStreamableHTTPTool(name="zerosecond", url=self.mcp_url, load_prompts=False)
+                await asyncio.wait_for(tool.__aenter__(), timeout=15)
+                self._mcp = tool
+            except Exception as exc:  # the Editor still works without tools
+                log.warning("MCP tool unavailable: %s", exc)
+                self._mcp_failed = True
+        return self._mcp
 
     async def write(self, facts: dict, angle: str, feedback: list[str] | None = None) -> dict:
         slots = ", ".join("{" + s + "}" for s in facts.get("slots", []))

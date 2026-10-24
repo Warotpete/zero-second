@@ -29,7 +29,7 @@ About 45 minutes the first time. Portal labels change often; if a button is name
    FOUNDRY_PROJECT_ENDPOINT=https://<resource>.services.ai.azure.com/api/projects/<project>
    FOUNDRY_MODEL=<deployment name>
    ```
-2. Your own account needs the **Azure AI User** role on the Foundry resource (the project creator usually has it).
+2. Your own account needs the **Foundry User** role on the Foundry resource (the project creator usually has it).
 3. Start the API (`az login` must be done). The log should say `Foundry agents ready (model …)` and the status bar in the Media Desk shows **Foundry · <model>**.
 4. Jump to 66' on the Live page and open **Agent Trace**: lanes show real model latency and the Editor's MCP tool calls.
 
@@ -46,7 +46,7 @@ From the repository root in PowerShell:
 The script:
 - builds the Docker image in Azure Container Registry and creates the Container App (`az containerapp up`),
 - pins it to one always-on replica (live rooms are in memory; no cold starts for judges),
-- turns on a managed identity and grants it **Azure AI User** on the Foundry resource (no keys),
+- turns on a managed identity and grants it **Foundry User** on the Foundry resource (no keys),
 - prints the public URL.
 
 Check logs: `az containerapp logs show -n zero-second -g zero-second-rg --follow`

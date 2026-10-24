@@ -83,7 +83,7 @@ win / late winner: exact Poisson enumeration of the remaining goals
 
 | | Used for |
 |---|---|
-| **Microsoft Foundry** | Hosts the model behind the Editor, Writer, Verifier and Recap agents (`FoundryChatClient`) |
+| **Microsoft Foundry** | Hosts gpt-5-mini behind the Editor, Writer, Verifier and Recap agents (`FoundryChatClient`, low reasoning effort) |
 | **Microsoft Agent Framework** (Python 1.23) | Agent definitions, tool calling, MCP client (`MCPStreamableHTTPTool`) |
 | **Model Context Protocol** | Zero Second MCP server exposes Stats Engine and Season Memory tools |
 | **Azure Container Apps** | Runs the single container (web, API, SSE stream, MCP, agents) |

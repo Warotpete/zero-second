@@ -32,6 +32,15 @@ def _rt(room: str):
     return _rooms.get(room or "demo")
 
 
+def _tid(rt, team: str) -> str:
+    """Accept a team id, full name or short name."""
+    t = team.strip().lower()
+    for tm in rt.world.teams.values():
+        if t in (tm.id.lower(), tm.name.lower(), tm.short.lower()):
+            return tm.id
+    raise ValueError(f"unknown team {team!r}; use one of {rt.home}, {rt.away}")
+
+
 def _pid(rt, player: str) -> str:
     """Accept a player id, initials or surname."""
     player = player.strip()
@@ -51,7 +60,8 @@ def get_match_state(room: str = "demo") -> dict:
 @mcp.tool(description="A team's expected goals (xG) over the last N minutes of the live match.")
 def stats_xg_window(team: str, minutes: int = 15, room: str = "demo") -> dict:
     rt = _rt(room)
-    return {"team": team, "minutes": minutes, "xg": rt.stats.xg_window(team, minutes), "shots": rt.stats.shots_window(team, minutes)}
+    tid = _tid(rt, team)
+    return {"team": tid, "minutes": minutes, "xg": rt.stats.xg_window(tid, minutes), "shots": rt.stats.shots_window(tid, minutes)}
 
 
 @mcp.tool(description="Season Memory: a player's arc (club goals, season goals, dropped/returned, signed).")
@@ -69,17 +79,20 @@ def memory_milestones(player: str, room: str = "demo") -> dict:
 
 @mcp.tool(description="Season Memory: head-to-head results between two teams (this and last season).")
 def memory_h2h(team: str, opponent: str, room: str = "demo") -> list[dict]:
-    return _rt(room).memory.h2h(team, opponent)
+    rt = _rt(room)
+    return rt.memory.h2h(_tid(rt, team), _tid(rt, opponent))
 
 
 @mcp.tool(description="Season Memory: current clean-sheet streak of a team's goalkeeper.")
 def memory_clean_sheets(team: str, room: str = "demo") -> dict:
-    return _rt(room).memory.clean_sheet_streak(team)
+    rt = _rt(room)
+    return rt.memory.clean_sheet_streak(_tid(rt, team))
 
 
 @mcp.tool(description="Season Memory: wins this season decided by a goal after the 80th minute.")
 def memory_late_winners(team: str, room: str = "demo") -> dict:
-    return _rt(room).memory.late_winners(team)
+    rt = _rt(room)
+    return rt.memory.late_winners(_tid(rt, team))
 
 
 @mcp.tool(description="Story Radar: current ranked storylines with probability, impact and lifecycle status.")

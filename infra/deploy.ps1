@@ -43,8 +43,8 @@ az containerapp update -n $AppName -g $ResourceGroup --min-replicas 1 --max-repl
 $principal = az containerapp identity assign -n $AppName -g $ResourceGroup --system-assigned --query principalId -o tsv
 if ($FoundryResourceId) {
   az role assignment create --assignee-object-id $principal --assignee-principal-type ServicePrincipal `
-    --role "Azure AI User" --scope $FoundryResourceId --only-show-errors | Out-Null
-  Write-Host "Granted 'Azure AI User' on the Foundry resource to the app's managed identity."
+    --role "Foundry User" --scope $FoundryResourceId --only-show-errors | Out-Null
+  Write-Host "Granted 'Foundry User' on the Foundry resource to the app's managed identity."
 }
 
 $fqdn = az containerapp show -n $AppName -g $ResourceGroup --query properties.configuration.ingress.fqdn -o tsv
