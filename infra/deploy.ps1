@@ -16,11 +16,14 @@ param(
   [string]$FoundryModel = "",
   [string]$FoundryResourceId = ""
 )
-$ErrorActionPreference = "Stop"
+# Windows PowerShell 5 turns az warnings on stderr into errors, so check exit codes instead.
+$ErrorActionPreference = "Continue"
+function Assert-Ok($what) { if ($LASTEXITCODE -ne 0) { Write-Host "FAILED: $what" -ForegroundColor Red; exit 1 } }
 $root = Split-Path -Parent $PSScriptRoot
 
 az extension add --name containerapp --upgrade --only-show-errors | Out-Null
 az group create -n $ResourceGroup -l $Location --only-show-errors | Out-Null
+Assert-Ok "resource group"
 
 $envVars = @("ZS_LLM=auto")
 if ($FoundryEndpoint) { $envVars += "FOUNDRY_PROJECT_ENDPOINT=$FoundryEndpoint" }
@@ -35,9 +38,11 @@ az containerapp up `
   --ingress external `
   --target-port 8000 `
   --env-vars $envVars
+Assert-Ok "containerapp up"
 
 # One replica: live match rooms are kept in memory. Always on, so judges never hit a cold start.
 az containerapp update -n $AppName -g $ResourceGroup --min-replicas 1 --max-replicas 1 --cpu 1 --memory 2Gi --only-show-errors | Out-Null
+Assert-Ok "scale settings"
 
 # Managed identity -> Foundry (no keys in the app).
 $principal = az containerapp identity assign -n $AppName -g $ResourceGroup --system-assigned --query principalId -o tsv
