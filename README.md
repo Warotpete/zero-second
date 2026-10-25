@@ -6,6 +6,8 @@ Most AI football tools explain a moment *after* it happens. Zero Second forecast
 
 **Live demo:** [Media Desk](https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/desk) (producers) · [Fan View](https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/fan) (best on a phone). No login needed; add `?room=yourname` for your own match.
 
+**Demo video (1:55):** https://youtu.be/mxpBGSXXRhA
+
 Built for the Microsoft × Premier League **Inside the Game** hackathon, challenge *The Synthetic Match Insights Engine for Premier League Studio*. Target category: **Best Enterprise Solution**.
 
 | | |

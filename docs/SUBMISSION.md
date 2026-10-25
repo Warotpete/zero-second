@@ -44,7 +44,7 @@ Human approval before publishing; hold/edit/revoke with re-verification; fault-i
 
 ### Try it
 Demo: https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/desk (producer) and https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/fan (fan, best on a phone). Press Play or Jump to 66', 78' and FT. Use `?room=yourname` for your own private match, and "New match → Random seed" to see that nothing is scripted.
-Video: <YOUTUBE URL>
+Video: https://youtu.be/mxpBGSXXRhA
 Code: https://github.com/Warotpete/zero-second
 
 All data is synthetic. No real clubs, players, logos or match footage.
