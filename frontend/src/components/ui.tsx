@@ -33,7 +33,7 @@ export function TopNav({ room }: { room: string }) {
         ))}
       </div>
       <div className="nav-right">
-        <span className="pill small">Markets UK · TH</span>
+        <span className="pill small">Market UK</span>
         <div className="avatar-p">P</div>
         <span style={{ fontWeight: 700 }}>Producer</span>
       </div>

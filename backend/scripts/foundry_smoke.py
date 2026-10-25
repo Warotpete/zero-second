@@ -24,7 +24,7 @@ async def main():
     print(f"writer {time.perf_counter() - t:.1f}s")
     print(json.dumps(draft, ensure_ascii=False, indent=1))
     for v in draft["versions"]:
-        for f in ("text", "sub", "gloss"):
+        for f in ("text", "sub"):
             if v.get(f):
                 chk = verify(v[f], FACTS, {"Mendes": "HFC-09", "Okafor": "NLU-09"}, set(FACTS["slots"]))
                 print(v["key"], f, "OK" if chk.ok else chk.issues)

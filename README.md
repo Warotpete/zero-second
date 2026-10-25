@@ -11,7 +11,7 @@ Built for the Microsoft × Premier League **Inside the Game** hackathon, challen
 | | |
 |---|---|
 | Media Desk (producers) | `/desk` – live rundown, Story Radar, pre-approval, overlay preview, agent trace, audit log, recap |
-| Fan View (mobile web) | `/fan` – moments, "Watch for" forecasts, Casual / Analyst, English / ไทย, follow a player, favourite club |
+| Fan View (mobile web) | `/fan` – moments, "Watch for" forecasts, Casual / Analyst, follow a player, favourite club, metric focus |
 | MCP server | `/mcp/` – Stats Engine and Season Memory as tools for any agent |
 | Overlay feed | `/api/rooms/{room}/overlays.json` – timed, machine-readable lower-thirds |
 
@@ -36,7 +36,7 @@ flowchart LR
   ED -- MCP tools --> MCP[(Zero Second MCP server)]
   MCP --- SE
   MCP --- SM
-  ED --> WR[Writer agent<br/>EN analyst, EN casual,<br/>TH casual, overlay]
+  ED --> WR[Writer agent<br/>analyst, casual,<br/>broadcast overlay]
   WR --> VE[Verifier<br/>code + agent]
   VE -- reject --> WR
   VE --> PR[Producer<br/>pre-approve / hold / edit]
@@ -120,7 +120,7 @@ Tests: `cd backend && .venv/Scripts/python -m pytest -q`
 
 1. Open **/desk**. Press **Play** (20×), or use **Jump** (60', 66', 72', 77', 80', FT).
 2. Watch *Mendes – 50th club goal* rise as Harbour City's xG surges after 63'. Turn **Autopilot producer** off to pre-approve it yourself (press **A**).
-3. At 78' it happens: the content publishes instantly with the real xG and shot speed filled in. Open **/fan** to see the fan's version (try ไทย and Analyst).
+3. At 78' it happens: the content publishes instantly with the real xG and shot speed filled in. Open **/fan** to see the fan's version (try Casual and Analyst).
 4. Turn on **Fault injection**, jump ahead, and open **Agent Trace** to see the Verifier reject and the Writer redraft.
 5. At full time open **Recap**: storyline outcomes, the agent-written recaps with citations, and forecast calibration.
 6. **New match → Random seed** (or type a seed such as `4821`) runs a fully random match in the same world. Nothing is scripted except the demo match's goals, post and one substitution; every probability is computed live.

@@ -141,7 +141,6 @@ class FakeFoundry:
         return {"versions": [
             {"key": "en_analyst", "text": f"Number {n} arrives in the {{minute_ord}} minute."},
             {"key": "en_casual", "text": "What a moment!"},
-            {"key": "th_casual", "text": "สุดยอด!", "gloss": "Amazing!"},
             {"key": "overlay", "text": "HEADLINE", "sub": "SUB"},
         ]}
 

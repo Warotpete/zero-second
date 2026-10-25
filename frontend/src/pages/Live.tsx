@@ -20,7 +20,7 @@ function WithSlots({ text }: { text: string }) {
   );
 }
 
-const VERSION_LABEL: Record<string, string> = { en_analyst: "EN Analyst", en_casual: "EN Casual", th_casual: "TH Casual", overlay: "Overlay" };
+const VERSION_LABEL: Record<string, string> = { en_analyst: "Analyst", en_casual: "Casual", overlay: "Overlay" };
 
 function FeedIcon({ it }: { it: FeedItem }) {
   if (it.kind === "goal") return <span className="ico">⚽</span>;
@@ -204,8 +204,7 @@ function Preview({ snap, sid, room }: { snap: Snapshot; sid: string | null; room
                 </>
               ) : (
                 <>
-                  <p className={v.lang === "th" ? "th" : ""}><WithSlots text={v.text} /></p>
-                  {v.gloss && <div className="gloss">(<WithSlots text={v.gloss} />)</div>}
+                  <p><WithSlots text={v.text} /></p>
                 </>
               )}
             </div>

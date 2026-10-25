@@ -19,7 +19,7 @@
   --away: var(--magenta);
   --radius: 12px;
   --mono: "JetBrains Mono", ui-monospace, monospace;
-  --font: "Outfit", "Noto Sans Thai", system-ui, sans-serif;
+  --font: "Outfit", system-ui, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -38,7 +38,6 @@ a { color: inherit; text-decoration: none; }
 .mono { font-family: var(--mono); }
 .muted { color: var(--muted); }
 .dim { color: var(--dim); }
-.th { font-family: "Noto Sans Thai", var(--font); }
 
 /* ---------- top nav ---------- */
 .topnav {
@@ -189,7 +188,6 @@ a { color: inherit; text-decoration: none; }
 .tabs button.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: #fff; border-radius: 3px; }
 .copybox { background: var(--bg-deep); border-radius: 10px; padding: 14px 16px; position: relative; }
 .copybox p { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.32; }
-.copybox .gloss { margin-top: 8px; color: var(--muted); font-size: 13px; font-weight: 500; }
 .overlay-frame {
   margin-top: 10px; aspect-ratio: 16 / 9; max-height: 210px; width: 100%; border-radius: 10px; background: repeating-linear-gradient(135deg, #160019 0 14px, #1b001f 14px 28px);
   position: relative; overflow: hidden;

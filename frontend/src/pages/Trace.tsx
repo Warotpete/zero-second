@@ -130,7 +130,7 @@ export default function Trace({ snap, room }: { snap: Snapshot; room: string }) 
               <div>verified</div><div>{c && c.versions.length ? "true" : "false"}</div>
               <div>state</div><div>{c?.state ?? s?.status}</div>
               <div>approved_by</div><div>{c?.approvedBy ?? "—"}</div>
-              <div>markets</div><div>UK, TH</div>
+              <div>markets</div><div>UK</div>
               <div>slots</div><div>{c?.slots.join(", ")}</div>
             </div>
             <h3 style={{ marginTop: 16 }}>Evidence</h3>

@@ -63,12 +63,11 @@ export interface Storyline {
 }
 
 export interface Version {
-  key: "en_analyst" | "en_casual" | "th_casual" | "overlay";
+  key: "en_analyst" | "en_casual" | "overlay";
   lang: string;
   audience: string;
   text: string;
   sub?: string;
-  gloss?: string;
   faultInjected?: boolean;
 }
 

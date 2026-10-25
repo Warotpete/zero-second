@@ -1,7 +1,7 @@
 """Deterministic Writer used when no Foundry endpoint is configured.
 
-Produces the same four versions the Foundry Writer does (EN analyst, EN casual,
-TH casual with an English gloss, broadcast overlay), using only facts-pack values
+Produces the same three versions the Foundry Writer does (analyst, casual,
+broadcast overlay), using only facts-pack values
 and live slots.
 """
 
@@ -32,75 +32,54 @@ def write_versions(f: dict) -> dict:
         if dropped:
             analyst = f"{target} club goals for {name}, and his first since being dropped for Matchweek {dropped}: a {{shot_xg}} xG chance finished at {{shot_speed}} km/h in the {{minute_ord}} minute."
             casual = f"{word.title()}! {last} answers his doubters in style."
-            th = f"{last} ยิงครบ {target} ประตูให้สโมสรแล้ว! ประตูแรกหลังถูกดร็อปในนัดที่ {dropped}"
-            gloss = f"{last} reaches {target} club goals! His first since being dropped in Matchweek {dropped}."
             sub = f"FIRST SINCE MW{dropped}"
         else:
             analyst = f"{target} club goals for {name}. Number {target} arrives from a {{shot_xg}} xG chance, struck at {{shot_speed}} km/h in the {{minute_ord}} minute."
             casual = f"{word.title()} for the club! {last} brings up the milestone."
-            th = f"{last} ยิงครบ {target} ประตูให้สโมสรแล้ว!"
-            gloss = f"{last} reaches {target} club goals!"
             sub = f"{{minute}}' · {{shot_xg}} XG"
         overlay = {"headline": f"{up} · {target} CLUB GOALS", "sub": sub}
     elif kind == "redemption":
         analyst = f"{name} scores for the first time since being dropped for Matchweek {dropped}, from a {{shot_xg}} xG chance in the {{minute_ord}} minute."
         casual = f"{last} is back! First goal since being dropped, and what a moment."
-        th = f"{last} กลับมาซัดประตูแรกหลังถูกดร็อปในนัดที่ {dropped}!"
-        gloss = f"{last} scores his first goal since being dropped in Matchweek {dropped}!"
         overlay = {"headline": f"{up} · FIRST SINCE BEING DROPPED", "sub": f"{{minute}}' · {{shot_xg}} XG"}
     elif kind == "tally":
         analyst = f"{name} reaches {target} goals for the season with a {{shot_xg}} xG finish in the {{minute_ord}} minute."
         casual = f"That's {target} this season for {last}!"
-        th = f"{last} ซัดประตูที่ {target} ของฤดูกาล!"
-        gloss = f"{last} scores his {ordinal(target)} goal of the season!"
         overlay = {"headline": f"{up} · {target} THIS SEASON", "sub": f"{{minute}}' · {{shot_xg}} XG"}
     elif kind == "debut":
         analyst = f"{name}, signed this week, scores on his debut: a {{shot_xg}} xG chance taken in the {{minute_ord}} minute."
         casual = f"What a start! {last} scores on his debut."
-        th = f"{last} ประเดิมสนามนัดแรกก็ยิงประตูได้ทันที!"
-        gloss = f"{last} scores on his debut!"
         overlay = {"headline": f"{up} · GOAL ON DEBUT", "sub": "SIGNED THIS WEEK"}
     elif kind in ("brace", "hattrick"):
         label = "brace" if kind == "brace" else "hat-trick"
         analyst = f"{name} adds another, his {label} today from a {{shot_xg}} xG chance in the {{minute_ord}} minute."
         casual = f"{last} again! That's a {label}."
-        th = f"{last} ซัด{'เบิ้ล' if kind == 'brace' else 'แฮตทริก'}!"
-        gloss = f"{last} scores a {label}!"
         overlay = {"headline": f"{up} · {label.upper()}", "sub": f"{{minute}}' · {{shot_xg}} XG"}
     elif kind == "clean_sheet":
         n = v["target"]
         analyst = f"{name} keeps a {ordinal(n)} consecutive clean sheet for {team['short']}."
         casual = f"Another shutout! {last} makes it {n} clean sheets in a row."
-        th = f"{last} เก็บคลีนชีตได้ {n} นัดติดต่อกัน!"
-        gloss = f"{last} keeps a clean sheet for the {ordinal(n)} match in a row!"
         overlay = {"headline": f"{up} · {n} CLEAN SHEETS IN A ROW", "sub": f"{team['short'].upper()} · FULL TIME"}
     elif kind == "revenge":
         then = f"{v['then_against']}–{v['then_for']}"
         when = "in August" if v.get("then_season") == "2026/27" and v.get("then_mw", 99) <= 3 else ("this season" if v.get("then_season") == "2026/27" else "last season")
         analyst = f"{team['name']} beat {opp['short']}, avenging the {then} defeat {when}. Final score {{score}}."
         casual = f"Revenge is sweet! {team['short']} get one back for the {then}."
-        th = f"{team['short']} แก้แค้นสำเร็จ! ล้างความพ่าย {then} ได้แล้ว"
-        gloss = f"{team['short']} get their revenge for the {then} defeat!"
         overlay = {"headline": f"{team['short'].upper()} · REVENGE FOR THE {then}", "sub": "FULL TIME · {score}"}
     elif kind == "late_winner":
         n = v["late_winner_n"]
         analyst = f"{team['name']} win it late: the decisive goal came after the 80th minute, their {ordinal(n)} late winner this season. Final score {{score}}."
         casual = f"Late, late drama! {team['short']} snatch it at the death."
-        th = f"{team['short']} ยิงประตูชัยช่วงท้ายเกม! เป็นครั้งที่ {n} ของฤดูกาล"
-        gloss = f"{team['short']} score a late winner, their {ordinal(n)} of the season!"
         overlay = {"headline": f"{team['short'].upper()} · LATE WINNER", "sub": f"{ordinal(n).upper()} THIS SEASON"}
     else:  # reactive goal with no storyline
         analyst = f"Goal for {team['short']}: {name} scores in the {{minute_ord}} minute from a {{shot_xg}} xG chance. It's {{score}}."
         casual = f"GOAL! {last} scores for {team['short']}!"
-        th = f"ประตู! {last} ทำประตูให้ {team['short']} ในนาทีที่ {{minute}}"
-        gloss = f"Goal! {last} scores for {team['short']} in minute {{minute}}."
         overlay = {"headline": f"GOAL · {up}", "sub": "{minute}' · {score}"}
 
     return {
         "versions": [
             {"key": "en_analyst", "lang": "en", "audience": "analyst", "text": analyst},
             {"key": "en_casual", "lang": "en", "audience": "casual", "text": casual},
-            {"key": "th_casual", "lang": "th", "audience": "casual", "text": th, "gloss": gloss},
             {"key": "overlay", "lang": "en", "audience": "overlay", "text": overlay["headline"], "sub": overlay["sub"]},
         ],
         "angle": _angle(kind, f),

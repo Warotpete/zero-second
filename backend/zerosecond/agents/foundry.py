@@ -36,11 +36,10 @@ Rules:
 - Do not mention probabilities, forecasts or models in the copy.
 - The editorial angle is guidance on tone and emphasis only: never copy numbers, shots, xG or match events from it.
 - Versions: en_analyst (1-2 sentences, data-rich, measured), en_casual (one punchy line for fans),
-  th_casual (natural Thai for Thai fans, with an English "gloss" translation), overlay (UPPERCASE headline
-  under 40 characters and a short UPPERCASE sub line).
+  overlay (UPPERCASE headline under 40 characters and a short UPPERCASE sub line).
 Reply with JSON only:
 {"versions":[{"key":"en_analyst","text":"..."},{"key":"en_casual","text":"..."},
-{"key":"th_casual","text":"...","gloss":"..."},{"key":"overlay","text":"HEADLINE","sub":"SUB"}]}"""
+{"key":"overlay","text":"HEADLINE","sub":"SUB"}]}"""
 
 VERIFIER_PROMPT = """You are the Verifier agent of Zero Second. The draft is PRE-WRITTEN content that will only be
 published at the moment the storyline in the facts pack happens. So judge it as if the storyline has just happened:

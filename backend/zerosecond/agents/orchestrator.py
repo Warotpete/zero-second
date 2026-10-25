@@ -261,8 +261,8 @@ class Orchestrator:
                 data = await self.llm.write(facts, angle, feedback)
                 vs = data["versions"]
                 keys = {v.get("key") for v in vs}
-                if {"en_analyst", "en_casual", "th_casual", "overlay"} <= keys:
-                    meta = {"en_analyst": ("en", "analyst"), "en_casual": ("en", "casual"), "th_casual": ("th", "casual"), "overlay": ("en", "overlay")}
+                if {"en_analyst", "en_casual", "overlay"} <= keys:
+                    meta = {"en_analyst": ("en", "analyst"), "en_casual": ("en", "casual"), "overlay": ("en", "overlay")}
                     return [{**v, "lang": meta[v["key"]][0], "audience": meta[v["key"]][1]} for v in vs if v.get("key") in meta]
                 raise ValueError("missing versions")
             except Exception as exc:
@@ -276,7 +276,7 @@ class Orchestrator:
         issues: list[str] = []
         checked = 0
         for v in versions:
-            for field_ in ("text", "sub", "gloss"):
+            for field_ in ("text", "sub"):
                 if v.get(field_):
                     chk = verify(v[field_], facts, names, slots)
                     checked += chk.numbers_checked
@@ -327,7 +327,7 @@ class Orchestrator:
                 s.prep = "pre_approved"
                 s.approved_by, s.approved_t = actor, self.now()
         self._trace(sid, "Producer", f"{'Approved' if c.published_t else 'Pre-approved'} by {actor}", "approve")
-        self._audit(actor, "Pre-approved" if not c.published_t else "Approved", f"{len(c.versions)} versions · markets UK, TH", sid)
+        self._audit(actor, "Pre-approved" if not c.published_t else "Approved", f"{len(c.versions)} versions", sid)
         return True
 
     def hold(self, sid: str, actor: str = "Producer") -> bool:
@@ -385,14 +385,14 @@ class Orchestrator:
         filled = []
         for v in c.versions:
             fv = dict(v)
-            for f in ("text", "sub", "gloss"):
+            for f in ("text", "sub"):
                 if fv.get(f):
                     fv[f] = _tidy(fill_slots(fv[f], slots))
             filled.append(fv)
         names = self._known_names()
         bad = []
         for v in filled:
-            for f in ("text", "sub", "gloss"):
+            for f in ("text", "sub"):
                 if v.get(f):
                     bad += verify(v[f], facts, names, set()).issues
         c.filled = filled
@@ -486,7 +486,7 @@ class Orchestrator:
             }
             self.overlays.append(cue)
         self._trace(sid, "Producer", f"Published · {len(versions)} versions", "publish")
-        self._audit("Publisher", "Published", f"{moment['title']} · {len(versions)} versions · UK, TH", sid)
+        self._audit("Publisher", "Published", f"{moment['title']} · {len(versions)} versions", sid)
 
     # ------------------------------------------------------------------ recap
     async def build_recap(self) -> None:

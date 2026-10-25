@@ -5,7 +5,6 @@ import { Avatar, Badge, Logo, Momentum, ProbBar, sideOf, initialsOf } from "../c
 import type { LineupPlayer, Moment, Snapshot, Storyline } from "../types";
 
 type Mode = "casual" | "analyst";
-type Lang = "en" | "th";
 type Tab = "moments" | "watch" | "timeline" | "stats" | "lineups";
 
 function useLocal<T>(key: string, init: T): [T, (v: T) => void] {
@@ -76,13 +75,12 @@ function Pitch({ snap, lineups, moment, follow }: { snap: Snapshot; lineups: Rec
   );
 }
 
-function versionFor(m: Moment, mode: Mode, lang: Lang) {
-  if (lang === "th") return m.versions.find((v) => v.key === "th_casual");
+function versionFor(m: Moment, mode: Mode) {
   return m.versions.find((v) => v.key === (mode === "analyst" ? "en_analyst" : "en_casual"));
 }
 
-function MomentCard({ m, mode, lang, snap }: { m: Moment; mode: Mode; lang: Lang; snap: Snapshot }) {
-  const v = versionFor(m, mode, lang);
+function MomentCard({ m, mode, snap }: { m: Moment; mode: Mode; snap: Snapshot }) {
+  const v = versionFor(m, mode);
   const s = snap.storylines.find((x) => x.id === m.storyline);
   const goal = snap.match.goals.find((g) => g.minute === m.minute && g.player === m.player);
   return (
@@ -94,10 +92,9 @@ function MomentCard({ m, mode, lang, snap }: { m: Moment; mode: Mode; lang: Lang
           <span className="pill small grad">{m.calledMinute <= 1 ? "Called pre-match" : `Called at ${m.calledMinute}'`} · {m.calledPct}%</span>
         ) : m.reactive ? <span className="pill small">Live</span> : null}
       </div>
-      <div className={lang === "th" ? "th" : ""} style={{ fontSize: mode === "casual" ? 26 : 18, fontWeight: 800, lineHeight: 1.15, margin: "8px 0", letterSpacing: "-0.01em" }}>
+      <div style={{ fontSize: mode === "casual" ? 26 : 18, fontWeight: 800, lineHeight: 1.15, margin: "8px 0", letterSpacing: "-0.01em" }}>
         {v?.text}
       </div>
-      {lang === "th" && v?.gloss && <div className="muted small">({v.gloss})</div>}
       {mode === "casual" && s?.memoryLine && <div className="muted" style={{ fontSize: 15 }}>Why it matters: {s.memoryLine}</div>}
       {mode === "analyst" && goal && (
         <div style={{ marginTop: 8 }}>
@@ -192,7 +189,6 @@ function WatchRow({ s, i, snap, bell, toggle }: { s: Storyline; i: number; snap:
 export default function Fan({ snap, room }: { snap: Snapshot; room: string }) {
   const [tab, setTab] = useState<Tab>("moments");
   const [mode, setMode] = useLocal<Mode>("zs.mode", "casual");
-  const [lang, setLang] = useLocal<Lang>("zs.lang", "en");
   const [follow, setFollow] = useLocal<string>("zs.follow", "HFC-09");
   const [club, setClub] = useLocal<string>("zs.club", snap.match.home.id);
   const [metric, setMetric] = useLocal<string>("zs.metric", "xg");
@@ -267,10 +263,6 @@ export default function Fan({ snap, room }: { snap: Snapshot; room: string }) {
               <button className={mode === "casual" ? "on" : ""} onClick={() => setMode("casual")}>Casual</button>
               <button className={mode === "analyst" ? "on" : ""} onClick={() => setMode("analyst")}>Analyst</button>
             </div>
-            <select className="select" style={{ height: 32, borderRadius: 999 }} value={lang} onChange={(e) => setLang(e.target.value as Lang)}>
-              <option value="en">English</option>
-              <option value="th">ไทย / Thai</option>
-            </select>
             <select className="select" style={{ height: 32, borderRadius: 999, maxWidth: 170 }} value={follow} onChange={(e) => setFollow(e.target.value)}>
               {players.filter((p) => p.role !== "GK").map((p) => <option key={p.id} value={p.id}>Following {p.short}</option>)}
             </select>
@@ -292,7 +284,7 @@ export default function Fan({ snap, room }: { snap: Snapshot; room: string }) {
           <>
             <Pitch snap={snap} lineups={lineups} moment={latest} follow={follow} />
             {moments.length === 0 && <div className="panel muted">No moments yet. They appear here the instant they happen, already written for you.</div>}
-            {moments.slice(0, mode === "casual" ? 2 : 3).map((mm) => <MomentCard key={mm.id} m={mm} mode={mode} lang={lang} snap={snap} />)}
+            {moments.slice(0, mode === "casual" ? 2 : 3).map((mm) => <MomentCard key={mm.id} m={mm} mode={mode} snap={snap} />)}
             {mode === "analyst" && (
               <div className="panel" style={{ marginBottom: 10 }}>
                 <h3>Why it matters (data)</h3>
