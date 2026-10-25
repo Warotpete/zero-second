@@ -43,14 +43,14 @@ Microsoft Foundry (models), Microsoft Agent Framework (agents, tools, MCP client
 Human approval before publishing; hold/edit/revoke with re-verification; fault-injection test mode; timeouts and fallbacks; a full audit log and per-storyline agent trace; keyless access to Foundry; overlay output in a stable JSON format; every number traceable to the Stats Engine or Season Memory.
 
 ### Try it
-Demo: <DEMO URL>/desk (producer) and <DEMO URL>/fan (fan, best on a phone). Press Play or Jump to 66', 78' and FT. Use `?room=yourname` for your own private match, and "New match → Random seed" to see that nothing is scripted.
+Demo: https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/desk (producer) and https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/fan (fan, best on a phone). Press Play or Jump to 66', 78' and FT. Use `?room=yourname` for your own private match, and "New match → Random seed" to see that nothing is scripted.
 Video: <YOUTUBE URL>
-Code: <GITHUB URL>
+Code: https://github.com/Warotpete/zero-second
 
 All data is synthetic. No real clubs, players, logos or match footage.
 ```
 
 **Testing instructions** (if the form asks)
 ```
-No login needed. Open <DEMO URL>/desk. Use Play or the Jump buttons. Each ?room=<name> is an independent match. Fan view: <DEMO URL>/fan on a phone or narrow window.
+No login needed. Open https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/desk. Use Play or the Jump buttons. Each ?room=<name> is an independent match. Fan view: https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/fan on a phone or narrow window.
 ```

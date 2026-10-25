@@ -4,6 +4,8 @@
 
 Most AI football tools explain a moment *after* it happens. Zero Second forecasts the storylines that **could** happen next, has AI agents prepare verified content for them **in advance**, lets a producer **pre-approve** it, and publishes the instant the moment happens. Every prediction is tracked to its outcome: *Happened*, *Near miss*, *Ruled out* or *Unresolved*.
 
+**Live demo:** [Media Desk](https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/desk) (producers) · [Fan View](https://zero-second.kindwave-e64411c5.eastus2.azurecontainerapps.io/fan) (best on a phone). No login needed; add `?room=yourname` for your own match.
+
 Built for the Microsoft × Premier League **Inside the Game** hackathon, challenge *The Synthetic Match Insights Engine for Premier League Studio*. Target category: **Best Enterprise Solution**.
 
 | | |
