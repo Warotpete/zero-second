@@ -1,0 +1,41 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="card.css">
+<style>
+  .wrap { width: 1500px; }
+  h2 { font-size: 54px; font-weight: 900; margin: 0 0 34px; letter-spacing: -0.03em; }
+  .row { display: flex; align-items: stretch; gap: 18px; margin-bottom: 18px; }
+  .box { flex: 1; background: #3a0842; border-radius: 16px; padding: 18px 20px; font-size: 22px; font-weight: 700; line-height: 1.25; }
+  .box small { display: block; color: #c7b5cf; font-weight: 500; font-size: 17px; margin-top: 6px; }
+  .agent { border: 2px solid #00ff85; }
+  .ms { border: 2px solid #04f5ff; }
+  .arrow { align-self: center; font-size: 30px; color: #c7b5cf; }
+  .lbl { font-size: 15px; letter-spacing: .08em; color: #c9a3ff; font-weight: 800; margin: 26px 0 10px; }
+</style></head>
+<body>
+  <div class="wrap">
+    <h2>How Zero Second works</h2>
+    <div class="row">
+      <div class="box">PitchForge<small>synthetic season + live events</small></div><div class="arrow">→</div>
+      <div class="box">Stats Engine<small>xG, momentum, tags (code)</small></div><div class="arrow">→</div>
+      <div class="box">Story Radar<small>probability × impact, lifecycle</small></div><div class="arrow">→</div>
+      <div class="box">Media Desk + Fan View<small>pre-approve · publish · personalise</small></div>
+    </div>
+    <div class="lbl">AGENTS ON MICROSOFT FOUNDRY · MICROSOFT AGENT FRAMEWORK</div>
+    <div class="row">
+      <div class="box agent">Editor<small>angle, calls MCP tools</small></div><div class="arrow">→</div>
+      <div class="box agent">Writer<small>analyst · casual · overlay</small></div><div class="arrow">⇄</div>
+      <div class="box agent">Verifier<small>code + agent, reject → redraft</small></div><div class="arrow">→</div>
+      <div class="box agent">Recap<small>cited full-time recaps</small></div>
+    </div>
+    <div class="lbl">PLATFORM</div>
+    <div class="row">
+      <div class="box ms">MCP server<small>Season Memory + stats tools</small></div>
+      <div class="box ms">Azure Container Apps<small>one container, managed identity</small></div>
+      <div class="box ms">Foundry · gpt-5-mini<small>keyless via Azure RBAC</small></div>
+      <div class="box ms">GitHub Actions<small>image build + CI</small></div>
+    </div>
+  </div>
+  <div class="stripe"></div>
+</body></html>

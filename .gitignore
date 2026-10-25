@@ -10,3 +10,5 @@ backend/data/*.log
 img/
 /*.png
 .claude/
+video/build/
+video/*.mp4

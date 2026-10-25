@@ -31,8 +31,8 @@ if TYPE_CHECKING:
 log = logging.getLogger("zerosecond.orchestrator")
 
 MAX_REDRAFTS = 2
-PREP_TOP_N = 3
-PREP_MIN_P = 0.06
+PREP_TOP_N = 4
+PREP_MIN_P = 0.04
 PREP_MIN_SCORE = 0.45
 AUTOPILOT_DELAY_S = 25.0  # match seconds before the autopilot producer approves
 AGENTS = ["Editor", "Writer", "Verifier", "Recap"]
@@ -123,7 +123,7 @@ class Orchestrator:
         """Called after each Radar update: start preparing the storylines worth preparing."""
         ranked = self.rt.radar.ranked()
         writing = sum(1 for c in self.content.values() if c.state == "writing")
-        limit = 2 if self.llm else 6
+        limit = 4 if self.llm else 6
         for i, s in enumerate(ranked):
             if s.prep != "none" or s.id in self.content:
                 continue
@@ -213,7 +213,7 @@ class Orchestrator:
                     draft = local_writer.write_versions(c.facts)["versions"]
                 if attempt == 0 and self.fault_injection:
                     draft = self._inject_fault(draft, c.facts)
-                label = "Drafted 4 versions" if attempt == 0 else f"Redraft #{attempt}"
+                label = f"Drafted {len(draft)} versions" if attempt == 0 else f"Redraft #{attempt}"
                 self._trace(sid, "Writer agent", label, "ok", (time.perf_counter() - t0) * 1000)
                 self._audit("Writer", "Drafted" if attempt == 0 else "Redrafted", f"{len(draft)} versions", sid)
                 self._busy("Writer", "idle")
@@ -537,10 +537,17 @@ class Orchestrator:
         issues = []
         for k, v in text.items():
             issues += [f"{k}: {i}" for i in verify(v, facts, names_map).issues]
+        if not issues and backend != "local":
+            try:
+                verdict = await self.llm.check_recap(payload, text)
+                if not verdict.get("ok", True):
+                    issues = [f"meaning: {i}" for i in verdict.get("issues", [])][:3] or ["meaning check failed"]
+            except Exception as exc:
+                log.warning("recap meaning check unavailable: %s", exc)
         if issues and backend != "local":
             text = local_writer.write_recap(payload)
             backend = "local"
-            self._audit("Verifier", "Rejected", f"recap: {issues[0]}", None, "error")
+            self._audit("Verifier", "Rejected", f"recap: {issues[0]}"[:160], None, "error")
         self.recap = {"text": text, "payload": payload, "state": "ready", "backend": backend, "verified": True, "approvedBy": None}
         self._audit("Recap", "Drafted", "3 recaps · verified", None)
         self._busy("Recap", "idle")

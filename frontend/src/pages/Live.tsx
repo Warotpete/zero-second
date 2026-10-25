@@ -3,7 +3,7 @@ import { api } from "../api";
 import { AgentBar, Avatar, Badge, ControlChaos, MatchStrip, Momentum, ProbBar, Spark, StatusTag, Toggle, TopNav, initialsOf, sideOf } from "../components/ui";
 import type { FeedItem, Snapshot, Storyline, Version } from "../types";
 
-const JUMPS = [1, 30, 60, 63, 66, 72, 77, 80, 89, 91];
+const JUMPS = [1, 30, 60, 63, 66, 72, 78, 80, 89, 91];
 function WithSlots({ text }: { text: string }) {
   return (
     <>

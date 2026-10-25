@@ -77,6 +77,9 @@ def test_verifier_catches_wrong_number_and_player():
     assert not bad.ok and "51" in bad.issues[0]
     assert not verify("Fifty-one? No: Okafor scored 50.", facts, names).ok  # Okafor is not in this story
     assert 50 in numbers_in("FIFTY! What a moment.")
+    live = {**facts, "why_now": "HFC xG so far: 0.00", "memory": [{"id": "mem-player-HFC-09", "text": "49 goals"}]}
+    assert not verify("Harbour City on 0.00 xG.", live, names).ok  # live context is not a publishable fact
+    assert not verify("He wore number 9.", live, names).ok  # digits inside ids don't count
 
 
 def test_slots_fill():
@@ -145,6 +148,9 @@ class FakeFoundry:
         ]}
 
     async def check(self, facts, draft):
+        return {"ok": True, "issues": []}
+
+    async def check_recap(self, payload, recap):
         return {"ok": True, "issues": []}
 
     async def recap(self, payload):

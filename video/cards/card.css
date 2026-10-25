@@ -1,0 +1,13 @@
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  font-family: "Outfit", system-ui, sans-serif; color: #fff; overflow: hidden;
+  background: radial-gradient(circle at 70% 20%, #4a0f50 0%, #2a0030 55%, #1d0022 100%);
+  display: grid; place-items: center;
+}
+.mark { width: 150px; height: 150px; border-radius: 34px; background: #00ff85; color: #2a0030; display: grid; place-items: center; font-weight: 900; font-size: 84px; letter-spacing: -0.04em; }
+.stripe { position: absolute; inset: auto 0 0 0; height: 10px; background: linear-gradient(90deg, #8a3cff, #4f7dff, #04f5ff); }
+h1 { font-size: 96px; font-weight: 900; letter-spacing: -0.04em; margin: 28px 0 8px; }
+p { font-size: 34px; color: #c7b5cf; margin: 0; font-weight: 500; }
+.center { text-align: center; display: flex; flex-direction: column; align-items: center; }
+.links { margin-top: 40px; font-size: 24px; color: #fff; font-family: "JetBrains Mono", monospace; line-height: 1.7; }

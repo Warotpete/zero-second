@@ -1,0 +1,18 @@
+{
+  "voice": "en-GB-RyanNeural",
+  "rate": "+4%",
+  "scenes": [
+    {"id": "s01_title", "text": "Every football app tells you what just happened. Zero Second gets ready for what's about to happen."},
+    {"id": "s02_desk", "text": "It's a newsroom engine for clubs and broadcasters. Story Radar ranks the storylines that could happen next, by probability times impact, from a calibrated statistical model, not a chatbot's guess."},
+    {"id": "s03_prepared", "text": "Harbour City are surging. Mendes is one goal from fifty for the club, his first since being dropped. Agents on Microsoft Foundry have already written it: an analyst version, a casual version and a broadcast graphic, with live slots for the minute and the xG."},
+    {"id": "s04_approve", "text": "The producer approves it now, before it happens."},
+    {"id": "s05_goal", "text": "Seventy-eight minutes. He scores, and it's out instantly, with the real numbers filled in from the Stats Engine."},
+    {"id": "s06_fan", "text": "Every fan gets their own version, casual or analyst, following their player."},
+    {"id": "s07_watch", "text": "Fans get the forecast too: what to watch for, how likely, and why. Storylines that die are tracked honestly, as ruled out or near miss."},
+    {"id": "s08_fault", "text": "Nothing ships unchecked. Here we inject a wrong number. The Verifier catches it, the Writer redrafts, and every step is traced and audited."},
+    {"id": "s09_recap", "text": "At full time, the Recap agent writes cited recaps from the storyline log, and we publish how accurate our forecasts are on two hundred held-out matches."},
+    {"id": "s10_seed", "text": "Nothing is scripted. Any seed is a new synthetic match."},
+    {"id": "s11_arch", "text": "Built with Microsoft Agent Framework and Foundry, an MCP server for stats and season memory, running on Azure Container Apps."},
+    {"id": "s12_end", "text": "Zero Second. Ready before it happens."}
+  ]
+}

@@ -14,8 +14,9 @@ if TYPE_CHECKING:
     from ..radar.radar import Storyline
     from ..runtime import MatchRuntime
 
-PLAYER_SLOTS = {"minute", "minute_ord", "score", "shot_xg", "shot_speed", "assist"}
-TEAM_SLOTS = {"score", "minute", "minute_ord"}
+PLAYER_SLOTS = {"minute", "minute_ord", "score", "shot_xg", "shot_speed"}
+FULL_TIME_SLOTS = {"score"}  # revenge, clean sheet and late winner are only decided at the final whistle
+FULL_TIME_KINDS = {"revenge", "clean_sheet", "late_winner"}
 
 
 def build_facts(rt: "MatchRuntime", s: "Storyline") -> dict:
@@ -30,7 +31,10 @@ def build_facts(rt: "MatchRuntime", s: "Storyline") -> dict:
         arc = mem.player_arc(s.player)
         players["subject"] = p.id
         names[p.id] = p.name
-        vals.update({"club_goals_now": arc["clubGoals"], "season_goals": arc["seasonGoals"]})
+        # explicit before/after so nobody can confuse "had 4" with "his 4th"
+        vals.update({"club_goals_before": arc["clubGoals"], "season_goals_before": arc["seasonGoals"]})
+        if s.kind != "clean_sheet":
+            vals.update({"club_goals_after": arc["clubGoals"] + 1, "season_goals_after": arc["seasonGoals"] + 1})
         if arc["droppedMw"]:
             vals["dropped_mw"] = arc["droppedMw"]
         if s.target:
@@ -38,6 +42,7 @@ def build_facts(rt: "MatchRuntime", s: "Storyline") -> dict:
         if s.kind == "brace":
             vals["goals_today"] = 1
             vals["club_goals_after"] = arc["clubGoals"] + 2
+            vals["season_goals_after"] = arc["seasonGoals"] + 2
         if s.kind == "hattrick":
             vals["goals_today"] = 2
         memory.append({"id": arc["factId"], "text": s.memory_line})
@@ -53,7 +58,7 @@ def build_facts(rt: "MatchRuntime", s: "Storyline") -> dict:
         lw = mem.late_winners(s.team)
         vals.update({"late_winners_before": lw["count"], "late_winner_n": lw["count"] + 1, "after_minute": 80})
         memory.append({"id": lw["factId"], "text": s.memory_line})
-    slots = PLAYER_SLOTS if s.player and s.kind != "clean_sheet" else TEAM_SLOTS
+    slots = FULL_TIME_SLOTS if s.kind in FULL_TIME_KINDS else PLAYER_SLOTS
     return {
         "storyline": {"id": s.id, "kind": s.kind, "title": s.title, "question": s.question, "impact": s.impact},
         "team": {"id": team.id, "name": team.name, "short": team.short},
@@ -72,12 +77,16 @@ def trigger_slots(rt: "MatchRuntime", s: "Storyline", event: dict | None) -> tup
     """Values for live slots at the trigger moment, plus extra facts they introduce."""
     stats = rt.stats
     minute = event["minute"] if event else stats.minute_now()
+    # score at the moment of the event, not when (possibly reactive) content is filled later
+    upto = event["t"] if event else stats.t
+    hg = sum(1 for g in stats.goals if g["team"] == rt.home and g["t"] <= upto)
+    ag = sum(1 for g in stats.goals if g["team"] == rt.away and g["t"] <= upto)
     slots: dict[str, object] = {
         "minute": minute,
         "minute_ord": ordinal(minute),
-        "score": f"{stats.score[rt.home]}–{stats.score[rt.away]}",
+        "score": f"{hg}–{ag}",
     }
-    extra: dict = {"values": {"minute": minute, "home_goals": stats.score[rt.home], "away_goals": stats.score[rt.away]}, "players": {}}
+    extra: dict = {"values": {"minute": minute, "home_goals": hg, "away_goals": ag}, "players": {}}
     if event and event.get("type") == "shot":
         shot = next((x for x in stats.shots if x["id"] == event["id"]), None)
         if shot:

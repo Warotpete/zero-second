@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Fan View</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="card.css">
+<style>
+  body { display: flex; align-items: center; justify-content: center; gap: 80px; }
+  .phone { width: 440px; height: 860px; border-radius: 54px; background: #0c000f; padding: 14px; box-shadow: 0 30px 80px #000a; }
+  iframe { width: 412px; height: 832px; border: 0; border-radius: 42px; background: #2a0030; }
+  .side { width: 520px; }
+  .side h2 { font-size: 64px; font-weight: 900; letter-spacing: -0.03em; margin: 0 0 14px; }
+  .side p { font-size: 28px; }
+</style></head>
+<body>
+  <div class="phone"><iframe id="fan" src="about:blank"></iframe></div>
+  <div class="side"><h2>Fan View</h2><p>Every fan gets their own version: casual or analyst, their player, their club.</p></div>
+  <div class="stripe"></div>
+  <script>document.getElementById("fan").src = new URLSearchParams(location.search).get("src") || "about:blank";</script>
+</body></html>

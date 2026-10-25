@@ -41,6 +41,10 @@ def numbers_in(text: str) -> list[float]:
     return out
 
 
+# keys that are context or identifiers, not publishable facts
+NOT_FACTS = {"why_now", "score_now", "slots", "players", "names", "id", "factId"}
+
+
 def allowed_numbers(facts: dict) -> set[float]:
     vals: set[float] = set()
 
@@ -53,8 +57,9 @@ def allowed_numbers(facts: dict) -> set[float]:
             for n in NUM_RE.findall(v):
                 vals.add(round(float(n), 2))
         elif isinstance(v, dict):
-            for x in v.values():
-                add(x)
+            for k, x in v.items():
+                if k not in NOT_FACTS:
+                    add(x)
         elif isinstance(v, (list, tuple)):
             for x in v:
                 add(x)

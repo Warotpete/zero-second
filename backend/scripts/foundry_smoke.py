@@ -11,7 +11,7 @@ FACTS = {
     "team": {"id": "HFC", "name": "Harbour City FC", "short": "Harbour City"},
     "opponent": {"id": "NLU", "name": "Northvale United", "short": "Northvale"},
     "players": {"subject": "HFC-09"}, "names": {"HFC-09": "Kai Mendes"},
-    "values": {"club_goals_now": 49, "target": 50, "dropped_mw": 6, "season_goals": 4, "probability_pct": 13, "matchweek": 12},
+    "values": {"club_goals_before": 49, "club_goals_after": 50, "target": 50, "dropped_mw": 6, "season_goals_before": 4, "season_goals_after": 5, "probability_pct": 13, "matchweek": 12},
     "memory": [{"id": "mem-player-HFC-09", "text": "49 goals · first since dropped MW6"}],
     "slots": ["minute", "minute_ord", "score", "shot_xg", "shot_speed", "assist"],
 }
